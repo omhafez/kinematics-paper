@@ -2,16 +2,74 @@
 
 Submit to CMAME \\
 
-1. justification for our specific format for incremental kinematics, i.e., we want D \\
-  - take in incremental displacements, want D and Rhat \\
-  - need to justify this \\
-  - if you have a corotational rate, it *should* be a Jaumann rate \\
-2. computation of D and Rhat \\
-3. full accounting of tangent modulus \\
-4. traction and pressure BC terms as well \\
-5. systematic exposition of accuracy, comparison to code A \\
-6. show importance of including all of the terms required for tangent stiffness as it pertains to convergence \\
-  - turn off selected terms in tangent stiffness, for example dRhat/duhat \\
+
+{\bf OUTLINE} \\
+
+\begin{itemize}
+\item {\bf Introduction (MARK)}
+\begin{itemize}
+\item finite deformation continuum mechanics, interest in application in finite elements
+\item Lagrangian mechanics, with large but reasonable deformations, not highly compressible, not 2000\% strain
+\item then need finite deformation capable incremental kinematics
+\item describe specific format for incremental kinematics, i.e., we want D
+\item take in incremental displacements, want D and Rhat
+\item need to justify this
+\item if you have a corotational rate, it *should* be a Jaumann rate
+\item need for accuracy in incremental kinematics
+\item coarse approximations are not sufficient
+\item discuss Hughes-Winget and Rashid 1993 / literature review of other approaches and why they aren't good enough
+\item Hughes-Winget: solving the exact differential, but solve approximately
+\item Ours: approximate the differential, and solve exactly
+\item mention we've set up some verification problems for your code / demonstration of the algorithm
+\item interested in implementing finite element codes
+\item consistent tangent to get good convergence
+\item literature review of incremental kinematics
+\end{itemize}
+
+\item {\bf Incremental Kinematics / Integration of Co-Rotational Rates / Kinematic Splitting}
+\begin{itemize}
+\item problem statement, what are we trying to do
+\item decompose the motion, need to separate stretch and rotate
+\item describe with equation Rashid 93 and Hughes Winget
+\item explain in detail what we do
+\item present the algorithm
+\end{itemize}
+
+\item {\bf Finite Element Implementation}
+\begin{itemize}
+\item work based on my previous document
+\item take a look at Brian's stuff
+\item explain we're interested in finite element applications
+\item involves the residual
+\item where does the material update fit into all of this
+\item motivate why need derivatives, newton's method
+\item high level equations for that
+\item appendix: more detailed equations if necessary
+\item KEEP IN MIND: may not be necessary to zoom out too far to residuals. Derivatives with respect to Fhat better. Would allow us to not mention Piola
+\item full accounting of tangent modulus
+\item traction and pressure BC terms as well
+\item grab new BC terms from Sam
+\end{itemize}
+
+\item {\bf demonstration of accuracy, comparison to code A}
+\begin{itemize}
+\item describe all the problems
+\item results
+\item interpretations
+\end{itemize}
+
+\item {\bf convergence}
+\begin{itemize}
+\item show importance of including all of the terms required for tangent stiffness as it pertains to convergence
+\item turn off selected terms in tangent stiffness, for example dRhat/duhat
+\item results
+\item interpretations
+\end{itemize}
+
+\item {\bf conclusions}
+
+\end{itemize}
+
 
 make comment about fatigue - lots of cycles
 

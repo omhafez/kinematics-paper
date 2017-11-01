@@ -1,4 +1,4 @@
-\section{Finite Element Residual and Tangent Stiffness}
+\section{Finite Element Implementation}
 %
 
 This section discusses the greater context of solid mechanics, and the corresponding finite element system of equations in the presence of finite deformations. According to the developments of the previous section, a strongly objective kinematic algorithm and its implementation are proposed in this setting.
@@ -60,28 +60,4 @@ This necessitates the specification of a ``kinematic splitting'' algorithm $K$ o
 which should also be capable of supplying kinematic tangent terms (i.e. $\partial \Delta \boldsymbol{\varepsilon} / \partial \nabla \hat{\mathbf{u}}$ and $\partial \hat{\mathbf{R}} / \partial \nabla \hat{\mathbf{u}}$).
 
 Given a set $\left\{ K, C, R \right\}$ consisting of the aforementioned procedures, a generic hypoelastic meterial update is formulated in algorithm \ref{alg:hypoelastic_update} which is valid for rate independent models.
-\begin{algorithm}
-\begin{spacing}{1.3}
- \caption{Hypoelastic material update procedure for rate independent models}
- \label{alg:hypoelastic_update}
- \begin{algorithmic}[1]
- \renewcommand{\algorithmicrequire}{\textbf{Input:  }}
- \renewcommand{\algorithmicensure}{\textbf{Output:  }}
- \REQUIRE $\boldsymbol{\sigma}_{k}$ and $\hat{\mathbf{F}}$
- \ENSURE  $\boldsymbol{\sigma}_{k+1}$ (optionally $\partial \boldsymbol{\sigma}_{k+1} / \partial \nabla \hat{\mathbf{u}}$)
-    \\ \textit{Kinematic split} :
-    \STATE Compute the (incremental) left Cauchy-Green deformation tensor $\hat{\mathbf{C}} = \hat{\mathbf{F}}^T \hat{\mathbf{F}}$
-    \STATE Compute the eigendecomposition of $\hat{\mathbf{C}}$ ($\mathbf{Q}$ and $\boldsymbol{\Lambda}^2$)
-    \STATE Compute the inverse of the incremental left stretch tensor $\hat{\mathbf{U}}^{-1} = \mathbf{Q} \boldsymbol{\Lambda}^{-1} \mathbf{Q}^T$
-    \STATE Compute the rotation increment $\hat{\mathbf{R}} = \hat{\mathbf{F}} \hat{\mathbf{U}}^{-1}$
-    \STATE Compute the logarithmic strain increment $\log (\hat{\mathbf{U}}) = \mathbf{Q} \log (\boldsymbol{\Lambda}) \mathbf{Q}^T$
-    \STATE (Optionally compute $\partial \log (\hat{\mathbf{U}}) / \partial \hat{\mathbf{F}}$ and $\partial \hat{\mathbf{R}} / \partial \hat{\mathbf{F}}$)
-    \\ \textit{Constitutive update} :
-    \STATE $\boldsymbol{\sigma}_{k+\frac{1}{2}} = \boldsymbol{\sigma}_{k} + \mathbb{C} : \log (\hat{\mathbf{U}})$ (optionally compute $\partial \boldsymbol{\sigma}_{k+\frac{1}{2}} / \partial \log (\hat{\mathbf{U}})$)
-    \\ \textit{Rotate stress} :
-    \STATE $\boldsymbol{\sigma}_{k+1} = \hat{\mathbf{R}} \boldsymbol{\sigma}_{k+\frac{1}{2}} \hat{\mathbf{R}}^T$ (optionally compute $\partial \boldsymbol{\sigma}_{k+1} / \partial \hat{\mathbf{R}}$)
-    \\ \textit{(Optionally) compute an algorithmically consistent tangent} :
-    \STATE $\frac{\partial \boldsymbol{\sigma}_{k+1}}{\partial \hat{\mathbf{F}}} = \frac{\partial \boldsymbol{\sigma}_{k+1}}{\partial \hat{\mathbf{R}}} : \frac{\partial \hat{\mathbf{R}}}{\partial \hat{\mathbf{F}}} + \hat{\mathbf{R}} \big(\frac{\partial \boldsymbol{\sigma}_{k+1/2}}{\partial \log (\hat{\mathbf{U}})} : \frac{\partial \log (\hat{\mathbf{U}})}{\partial \hat{\mathbf{F}}} \big) \hat{\mathbf{R}}^T$
- \end{algorithmic}
- \end{spacing}
- \end{algorithm}
+
