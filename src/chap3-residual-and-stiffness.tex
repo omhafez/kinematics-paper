@@ -3,19 +3,13 @@
 
 This section discusses the greater context of solid mechanics, and the corresponding finite element system of equations in the presence of finite deformations. According to the developments of the previous section, a strongly objective kinematic algorithm and its implementation are proposed in this setting.
 
-For a continuum body which occupies an open domain $\Omega_0 \subset \mathbb{R}^d$ in its undeformed configuration, the weak form equations of equilibrium may be expressed as
-\begin{equation}
-    R_{i} \equiv \int_{\Omega_0} P_{ij} \phi_{,j} \, d \Omega_0 + \int_{\Gamma_0} p_i \phi \, d \Gamma_0 = 0 \quad \forall i, \phi \in H^1_0 (\Omega_0),
-\end{equation}
-where $\mathbf{P}$ represents the first Piola-Kirchhoff stress tensor, and $\mathbf{p}$ is the Piola traction vector. This representation is amenable to a total Lagrangian approach.
+-Discuss the need for a consistent linearization of the residual for use in a non-linear Newton solver.
 
-Discuss the need for a consistent linearization of the residual for use in a non-linear Newton solver.
+-Perhaps without even referring to finite elements, discuss the computations that are needed at the quadrature-point level.
 
-Perhaps without even referring to finite elements, discuss the computations that are needed at the quadrature-point level.
+-Explain the steps needed for the evaluation of the residual contribution (at a quadrature point), and correspondingly for the evaluation of the tangent contribution:
 
-Explain the steps needed for the evaluation of the residual contribution (at a quadrature point), and correspondingly for the evaluation of the tangent contribution:
-
-Elaborate on how to compute exact derivatives of the relevant quantities
+-Elaborate on how to compute exact derivatives of the relevant quantities
 
 include all the derivatives\\
 a complete, full implementation, with code snippet\\
@@ -73,53 +67,21 @@ Given a set $\left\{ K, C, R \right\}$ consisting of the aforementioned procedur
  \begin{algorithmic}[1]
  \renewcommand{\algorithmicrequire}{\textbf{Input:  }}
  \renewcommand{\algorithmicensure}{\textbf{Output:  }}
- \REQUIRE $S_k$ and $\nabla \hat{\mathbf{u}}$
- \ENSURE  $S_{k+1}$ (optionally $\partial \boldsymbol{\sigma}_{k+1} / \partial \nabla \hat{\mathbf{u}}$)
+ \REQUIRE $\boldsymbol{\sigma}_{k}$ and $\hat{\mathbf{F}}$
+ \ENSURE  $\boldsymbol{\sigma}_{k+1}$ (optionally $\partial \boldsymbol{\sigma}_{k+1} / \partial \nabla \hat{\mathbf{u}}$)
     \\ \textit{Kinematic split} :
-    \STATE $\left\{ \Delta \boldsymbol{\varepsilon}, \, \hat{\mathbf{R}} \right\} = K(\nabla \hat{\mathbf{u}})$ (optionally compute $\partial \Delta \boldsymbol{\varepsilon} / \partial \nabla \hat{\mathbf{u}}$ and $\partial \hat{\mathbf{R}} / \partial \nabla \hat{\mathbf{u}}$)
+    \STATE Compute the (incremental) left Cauchy-Green deformation tensor $\hat{\mathbf{C}} = \hat{\mathbf{F}}^T \hat{\mathbf{F}}$
+    \STATE Compute the eigendecomposition of $\hat{\mathbf{C}}$ ($\mathbf{Q}$ and $\boldsymbol{\Lambda}^2$)
+    \STATE Compute the inverse of the incremental left stretch tensor $\hat{\mathbf{U}}^{-1} = \mathbf{Q} \boldsymbol{\Lambda}^{-1} \mathbf{Q}^T$
+    \STATE Compute the rotation increment $\hat{\mathbf{R}} = \hat{\mathbf{F}} \hat{\mathbf{U}}^{-1}$
+    \STATE Compute the logarithmic strain increment $\log (\hat{\mathbf{U}}) = \mathbf{Q} \log (\boldsymbol{\Lambda}) \mathbf{Q}^T$
+    \STATE (Optionally compute $\partial \log (\hat{\mathbf{U}}) / \partial \hat{\mathbf{F}}$ and $\partial \hat{\mathbf{R}} / \partial \hat{\mathbf{F}}$)
     \\ \textit{Constitutive update} :
-    \STATE $S_{k+\frac{1}{2}} = C (S_k, \, \Delta \boldsymbol{\varepsilon})$ (optionally compute $\partial \boldsymbol{\sigma}_{k+\frac{1}{2}} / \partial \Delta \boldsymbol{\varepsilon}$)
-    \\ \textit{Rotate state} :
-    \STATE $S_{k+1} = R (S_{k+\frac{1}{2}}, \hat{\mathbf{R}})$ (optionally compute $\partial \boldsymbol{\sigma}_{k+1} / \partial \hat{\mathbf{R}}$)
+    \STATE $\boldsymbol{\sigma}_{k+\frac{1}{2}} = \boldsymbol{\sigma}_{k} + \mathbb{C} : \log (\hat{\mathbf{U}})$ (optionally compute $\partial \boldsymbol{\sigma}_{k+\frac{1}{2}} / \partial \log (\hat{\mathbf{U}})$)
+    \\ \textit{Rotate stress} :
+    \STATE $\boldsymbol{\sigma}_{k+1} = \hat{\mathbf{R}} \boldsymbol{\sigma}_{k+\frac{1}{2}} \hat{\mathbf{R}}^T$ (optionally compute $\partial \boldsymbol{\sigma}_{k+1} / \partial \hat{\mathbf{R}}$)
     \\ \textit{(Optionally) compute an algorithmically consistent tangent} :
-    \STATE $\frac{\partial \boldsymbol{\sigma}_{k+1}}{\partial \nabla \hat{\mathbf{u}}} = \frac{\partial \boldsymbol{\sigma}_{k+1}}{\partial \hat{\mathbf{R}}} : \frac{\partial \hat{\mathbf{R}}}{\partial \nabla \hat{\mathbf{u}}} + R \big(\frac{\partial \boldsymbol{\sigma}_{k+1/2}}{\partial \Delta \boldsymbol{\varepsilon}} : \frac{\partial \Delta \boldsymbol{\varepsilon}}{\partial \nabla \hat{\mathbf{u}}}, \hat{\mathbf{R}}\big)$
+    \STATE $\frac{\partial \boldsymbol{\sigma}_{k+1}}{\partial \hat{\mathbf{F}}} = \frac{\partial \boldsymbol{\sigma}_{k+1}}{\partial \hat{\mathbf{R}}} : \frac{\partial \hat{\mathbf{R}}}{\partial \hat{\mathbf{F}}} + \hat{\mathbf{R}} \big(\frac{\partial \boldsymbol{\sigma}_{k+1/2}}{\partial \log (\hat{\mathbf{U}})} : \frac{\partial \log (\hat{\mathbf{U}})}{\partial \hat{\mathbf{F}}} \big) \hat{\mathbf{R}}^T$
  \end{algorithmic}
  \end{spacing}
  \end{algorithm}
- 
-\subsection{Kinematic Splitting Algorithm}
-
-The specification of an appropriate kinematic splitting algorithm depends on two primary considerations: the objective stress rate with which the intended algorithm is to maintain consistency, and the desired level of accuracy that the algorithm should achieve.
-
-A material update procedure is called \textit{consistent} with a given objective stress rate if the truncation error $\tau(\Delta t)$ of the algorithm approaches zero in the limit as $\Delta t \rightarrow 0$, i.e.
-\begin{equation}
-    \lim_{\Delta t \rightarrow 0} \tau (\Delta t) = 0.
-\end{equation}
-It suffices to show that 
-\begin{equation}
-    \lim_{\Delta t \rightarrow 0} \frac{\boldsymbol{\sigma}_{k+1} - \boldsymbol{\sigma}_{k}}{\Delta t} = \accentset{\circ}{\boldsymbol{\sigma}} + \mathbf{W} \cdot \boldsymbol{\sigma} - \boldsymbol{\sigma} \cdot \mathbf{W},
-\end{equation}
-where $\Delta t = t_{k+1} - t_{k}$. It can be easily shown that algorithm \ref{alg:hypoelastic_update} is consistent with the Jaumann rate, provided an appropriate kinematic splitting algorithm is employed.
-
-
-\begin{algorithm}
-\begin{spacing}{1.2}
- \caption{Strongly objective kinematic splitting algorithm}
- \label{alg:kinematic_splitting}
- \begin{algorithmic}[1]
- \renewcommand{\algorithmicrequire}{\textbf{Input:  }}
- \renewcommand{\algorithmicensure}{\textbf{Output:  }}
- \REQUIRE $\nabla \hat{\mathbf{u}}$
- \ENSURE $\Delta \boldsymbol{\varepsilon}$ and $\hat{\mathbf{R}}$ (optionally $\partial \Delta \boldsymbol{\varepsilon} / \partial \nabla \hat{\mathbf{u}}$ and $\partial \hat{\mathbf{R}} / \partial \nabla \hat{\mathbf{u}}$)
-    \\ \textit{Compute the incremental Green-Lagrange strain} :
-    \STATE $\hat{\mathbf{E}} = \frac{1}{2}(\hat{\mathbf{C}} - \mathbf{1}) = \frac{1}{2}(\nabla \hat{\mathbf{u}} + \nabla \hat{\mathbf{u}}^T + \nabla \hat{\mathbf{u}}^T \nabla \hat{\mathbf{u}})$
-    \\ \textit{Compute the eigendecomposition} :
-    \STATE $\frac{1}{2} \mathbf{Q} (\boldsymbol{\Lambda}^2 - \mathbf{1}) \mathbf{Q}^T = \text{eig} (\hat{\mathbf{E}})$
-    \\ \textit{Compute the rotation increment} :
-    \STATE $\hat{\mathbf{R}} = (\mathbf{1} + \hat{\mathbf{u}}) \mathbf{Q} \boldsymbol{\Lambda}^{-1} \mathbf{Q}^T$
-    \\ \textit{Compute the logarithmic strain increment} :
-    \STATE $\Delta \boldsymbol{\varepsilon} = \mathbf{Q} \log (\boldsymbol{\Lambda}) \mathbf{Q}^T$
- \end{algorithmic}
- \end{spacing}
- \end{algorithm}
-

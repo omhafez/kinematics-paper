@@ -1,6 +1,7 @@
 \section{Incremental Kinematics}
 %
 
+
 \newcommand{\ds}{\displaystyle}
 \newcommand{\mparen}[1]{\displaystyle \big( #1 \big)}
 \newcommand{\mbrack}[1]{\displaystyle \big[ #1 \big]}
@@ -86,7 +87,46 @@ Substituting these back into our stress update procedure gives
 
 $$\boxed{\sigma_{i+1} = R \; \bparen{\sigma_i + C : \log(U)} \; R^\top}$$
 
+As a practical matter, an implementation of this procedure is included below:
 
+
+\begin{tcolorbox}
+Given the current deformation gradient $\mathbf{F}(t)$, current Cauchy stress $\sigma(t)$, and
+a displacement increment $\hat{u}$,
+\begin{enumerate}
+\item compute the end-step deformation gradient
+$$ \mathbf{F}(t + \Delta t) = \mathbf{F}(t) + \nabla \hat{u} $$
+\item find the incremental deformation gradient
+$$ \Delta \mathbf{F} = \mathbf{F}(t + \Delta t) \, \mathbf{F}(t)^{-1} $$
+\item get the strain increment
+$$ \Delta \mathbf{E} = \frac{1}{2}(\Delta \mathbf{F}^{\,\intercal} \Delta \mathbf{F} - \mathbf{1}) $$
+\item Determine $\mathbf{Q}, \mathbf{\Lambda}$ from the eigendecomposition\footnote{
+a closed form expression for the eigendecomposition of 3x3 symmetric matrices can be found 
+in this paper by ...
+} of $\Delta \mathbf{E}$
+$$ \frac{1}{2} \mathbf{Q} \, (\mathbf{\Lambda}^2 - \mathbf{1}) \, \mathbf{Q}^\intercal = \Delta \mathbf{E} $$
+\item form the polar decomposition of $\Delta \mathbf{F} = \Delta \mathbf{R} \Delta \mathbf{U}$
+$$ 
+\begin{cases} 
+  \Delta \mathbf{U} = \mathbf{Q} \, \mathbf{\Lambda} \, \mathbf{Q}^\intercal  \\
+  \Delta \mathbf{R} = \Delta \mathbf{F} \; \Delta \mathbf{U}^{-1}
+\end{cases}
+$$
+\item compute the updated, unrotated stress
+$$ \bar \sigma = 
+\hat{\sigma}(\sigma(t), \log(\Delta \mathbf{U})) = 
+\hat{\sigma}(\sigma(t), \mathbf{Q} \, \log(\mathbf{\Lambda}) \, \mathbf{Q}^\intercal)
+$$
+\item rotate the stress
+$$ \sigma(t + \Delta t) = \Delta \mathbf{R} \; \bar{\sigma} \; \Delta \mathbf{R}^\intercal $$
+\end{enumerate}
+\end{tcolorbox}
+
+\pagebreak
+
+\subsection{Kinematic Splitting Algorithm}
+
+The specification of an appropriate kinematic splitting algorithm depends on two primary considerations: the objective stress rate with which the intended algorithm is to maintain consistency, and the desired level of accuracy that the algorithm should achieve.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
