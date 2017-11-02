@@ -14,7 +14,7 @@ $$ \overset{\Delta}{\sigma} \equiv
 \dot{\sigma} + \sigma \cdot W - W \cdot \sigma = 
 C : D $$
 
-where $ D = \frac{1}{2} (L + L^\top), \; W = \frac{1}{2} (L - L^\top)$, and $L = \dot{F}
+where $ D = \frac{1}{2} (L + L^{\mathsf{T}}), \; W = \frac{1}{2} (L - L^{\mathsf{T}})$, and $L = \dot{F}
 F^{-1} $. We would like to know how the stress state changes after applying
 a prescribed deformation. Our approach is as follows: parameterize the deformation
 into separate stages of pure stretch and pure rotation. The advantage of this
@@ -42,19 +42,19 @@ provided that $D, W$ are constant ($C$ is also assumed to be constant):
 \qquad 
 & \Longrightarrow 
 \qquad 
-\sigma_{i+1} = \exp(W \Delta t) \; \sigma_{i+\frac{1}{2}} \; \exp(W \Delta t)^{\top}
+\sigma_{i+1} = \exp(W \Delta t) \; \sigma_{i+\frac{1}{2}} \; \exp(W \Delta t)^{{\mathsf{T}}}
 \end{align*}
 
 Combining these two results gives us our stress update procedure:
 
-$$ \sigma_{i+1} = \exp(W \Delta t) \; \bparen{\sigma_i + C : D \Delta t} \; \exp(W \Delta t)^{\top} $$
+$$ \sigma_{i+1} = \exp(W \Delta t) \; \bparen{\sigma_i + C : D \Delta t} \; \exp(W \Delta t)^{{{\mathsf{T}}}} $$
 
 All that remains is to find reasonable approximations for $D, W$. To that end, we
 consider the polar decomposition of the incremental deformation gradient, 
 $F = R \; U$. After taking a time derivative of $F$, and substituting into the
 definition of $L$, we get:
 
-$$ L \equiv D + W = \dot{R} \; R^\top + R \; \dot{U} \; U^{-1} \; R^\top $$
+$$ L \equiv D + W = \dot{R} \; R^{\mathsf{T}} + R \; \dot{U} \; U^{-1} \; R^{\mathsf{T}} $$
 
 When considering the separate stages of pure stretch and pure rotation, this
 equation reduces to:
@@ -62,7 +62,7 @@ equation reduces to:
 \begin{align*}
 \begin{cases}
 D = \dot{U} \; U^{-1} & \qquad \text{pure stretch} \\
-W = \dot{R} \; R^\top & \qquad \text{pure rotation}
+W = \dot{R} \; R^{\mathsf{T}} & \qquad \text{pure rotation}
 \end{cases}
 \end{align*}
 
@@ -85,7 +85,7 @@ $$ D = \frac{1}{\Delta t} \log(U), \qquad W = \frac{1}{\Delta t} \log(R) $$
 
 Substituting these back into our stress update procedure gives 
 
-$$\boxed{\sigma_{i+1} = R \; \bparen{\sigma_i + C : \log(U)} \; R^\top}$$
+$$\boxed{\sigma_{i+1} = R \; \bparen{\sigma_i + C : \log(U)} \; R^{\mathsf{T}}}$$
 
 As a practical matter, an implementation of this procedure is included below:
 
