@@ -3,6 +3,14 @@
 Submit to CMAME \\
 
 
+{\bf NOTES} \\
+log log error plot convergence for delta, include for the two simple problems \\
+sigma over T \\
+hats over deltas \\
+embolden sigma \\
+sigma and derivative, then residual \\
+images for problems \\
+
 {\bf OUTLINE} \\
 
 \begin{itemize}
@@ -73,10 +81,19 @@ Submit to CMAME \\
 
 make comment about fatigue - lots of cycles
 
+\subsection{Summary}
+
+The use of hypoelastic material models for applications in computational solid mechanics poses several challenges when finite deformations are taken into consideration. Namely, an appropriate objective (co-rotational) stress rate must be specified, and a method of approximately integrating the chosen rate equation over a finite time interval must be devised. These concerns have led to the development of so-called ``incrementally objective'' algorithms, which provide a means of updating the state of stress over successive increments of deformation.
+
+Many early incrementally objective algorithms utilized the Jaumann rate of stress, owing to its relative ease of implementation within existing finite element codes. Over the past few decades, many alternative objective rates have been proposed to address apparent shortcomings of the Jaumann rate for problems involving relatively large shear strains (\cite{dienes1979}). Nonetheless, the Jaumann rate is still widely used in engineering simulations, as the aforementioned issues are significant only if the material undergoes truly large deformations.
+
+Common one-step time integration algorithms for objective stress rates require the computation of a strain increment and a rotation increment, which are used to update the stress in a step-wise fashion. The accuracy of these methods depends entirely upon how the strain and rotation increments are computed. Hughes and Winget proposed one of the simplest and most widely used mid-interval integration schemes in \cite{hughes1980}. The algorithm produces a rotation increment which is strictly orthogonal, and yields an exact integration for rigid rotations. However, the method has been shown to be inaccurate for problems involving cyclic shearing deformations \cite{rashid1996}. Rashid rationalized in \cite{rashid1993} that algorithms using mid-interval approximations to compute stretching and rotation increments were only ``weakly objective,'' in the sense that unintended coupling between the computed stretching and rotation increments may occur for general input motions. To remedy this issue, the notion of ``strong objectivity'' was introduced: the idea that the stretching and rotational motions should be decoupled over the time step. Rashid suggested that this could be accomplished via polar decomposition of the incremental deformation gradient into two separate and discrete motions: a pure stretching motion, and a pure rotational motion, applied in sequence.
+
 \subsection{Explanation of References}
+
 Hughes and Winget have proposed one of the earliest (weakly) objective incremental algorithms in \cite{hughes1980} which relies upon the Jaumann rate of stress. Therein, they introduced the notion of ``incremental objectivity.'' Subsequently, Rubinstein and Atluri provided a more rigorous mathematical investigation into the conditions of objectivity for incremental algorithms in \cite{rubinstein1983}. Flanagan and Taylor later proposed an algorithm in \cite{flanagan1987} based upon the Green-Naghdi co-rotational rate, which considers an evolution of the material state in its ``unrotated'' configuration.
 
-In contrast with previous works where both the stretching and rotation increment are computed approximately, Roy et. al. have suggested in \cite{roy1992} that the polar decomposition be computed via the Cayley-Hamilton theorem for use in incrementally objective algorithms to improve accuracy.
+ In \cite{roy1992}, Roy et. al. noted that the rotation increment may be computed more accurately using the polar decomposition of the deformation gradient, proposing an algorithm which exploits the Cayley-Hamilton theorem to efficiently compute the polar decomposition. Nonetheless, the strain increment is still computed via the classical mid-interval approximation.
 
 Rashid introduced the notion of ``strong'' objectivity in the context of incrementally objective algorithms in \cite{rashid1993}. A strongly objective algorithm was then proposed, though it utilized approximate expressions for the stretching and rotation tensors appearing therein. Nonetheless, significant improvements in accuracy were demonstrated by Rashid and Thorne in \cite{rashid1996}, particularly for cyclic shearing deformations.
 
